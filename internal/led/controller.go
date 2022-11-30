@@ -50,7 +50,7 @@ func (c *controller) Close() {
 
 func (c *controller) Fill(color uint32, render bool) error {
 	for i := 0; i < c.ledCount; i++ {
-		_ = c.SetLed(0, color, false)
+		_ = c.SetLed(i, color, false)
 	}
 
 	if render {

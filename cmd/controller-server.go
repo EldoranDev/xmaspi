@@ -16,14 +16,8 @@ import (
 // serverCmd represents the server command
 var serverCmd = &cobra.Command{
 	Use:   "server",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
-	Run: func(cmd *cobra.Command, args []string) {
+	Short: "start the xmaspi server",
+	RunE: func(cmd *cobra.Command, args []string) error {
 		lis, err := net.Listen(
 			"tcp",
 			fmt.Sprintf("%s:%d", viper.GetString("grpc.host"), viper.GetInt("grpc.port")),
@@ -36,15 +30,23 @@ to quickly create a Cobra application.`,
 		var opts []grpc.ServerOption
 
 		server := grpc.NewServer(opts...)
+		controller, err := getController()
 
-		proto.RegisterXmasPIServer(server, proto.NewServer())
+		if err != nil {
+			return err
+		}
+
+		proto.RegisterXmasPIServer(server, proto.NewServer(controller))
+
+		controller.Init()
+		defer controller.Close()
 
 		_ = server.Serve(lis)
 
+		return nil
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(serverCmd)
-
+	controllerCmd.AddCommand(serverCmd)
 }

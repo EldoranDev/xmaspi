@@ -4,7 +4,6 @@
 package cmd
 
 import (
-	"github.com/EldoranDev/xmaspi/v2/internal/led"
 	"github.com/spf13/cobra"
 	"time"
 )
@@ -20,31 +19,29 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		controller, err := led.NewController(
-			led.WithLedCount(50),
-			led.WithBrightness(128),
-			led.WithDataPin(18),
-		)
+		controller, err := getController()
 
 		if err != nil {
 			return err
 		}
 
+		controller.Init()
+		defer controller.Close()
+
 		for i := 0; ; i++ {
-			for led := 0; led < 50; led++ {
+			for led := 0; led < controller.LedCount(); led++ {
 				if i%2 == 0 {
 					_ = controller.SetLed(led, 0xFFFFFF, true)
 				} else {
 					_ = controller.SetLed(led, 0x000000, true)
 				}
-			}
-			_ = controller.Fill(0x000000, true)
 
-			time.Sleep(time.Millisecond * 100)
+				time.Sleep(time.Millisecond * 50)
+			}
 		}
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(testCmd)
+	controllerCmd.AddCommand(testCmd)
 }

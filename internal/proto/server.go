@@ -5,25 +5,34 @@ package proto
 
 import (
 	"context"
-	"fmt"
 	"github.com/EldoranDev/xmaspi/v2/internal/led"
 )
 
-func NewServer() XmasPIServer {
-	return &xmaspiServer{}
+func NewServer(ctrl led.Controller) XmasPIServer {
+	return &xmaspiServer{
+		controller: ctrl,
+	}
 }
 
 type xmaspiServer struct {
 	controller led.Controller
 }
 
-func (x *xmaspiServer) ChangeMode(ctx context.Context, request *ModeChangeRequest) (*ModeChangeResponse, error) {
-	//TODO implement me
-	panic("implement me")
+func (x *xmaspiServer) SetStatic(ctx context.Context, request *SetStaticRequest) (*SetStaticResponse, error) {
+	x.controller.Fill(
+		request.Color,
+		true,
+	)
+
+	return &SetStaticResponse{}, nil
 }
 
 func (x *xmaspiServer) SetLed(ctx context.Context, request *SetLedRequest) (*SetLedResponse, error) {
-	fmt.Printf("Got request: %d -> %x", request.Led, request.Color)
+	x.controller.SetLed(
+		int(request.Led),
+		request.Color,
+		true,
+	)
 
 	return &SetLedResponse{}, nil
 }
