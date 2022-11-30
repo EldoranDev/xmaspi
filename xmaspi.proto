@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+option go_package = "github.com/EldoranDev/xmaspi/v2/internal/proto";
+
+service XmasPI {
+  rpc ChangeMode(ModeChangeRequest) returns (ModeChangeResponse);
+  rpc SetLed(SetLedRequest) returns (SetLedResponse);
+  rpc SetAnimation(SetAnimationRequest) returns (SetAnimationResponse);
+}
+
+enum Mode {
+  MODE_INACTIVE = 0;
+  MODE_STATIC = 1;
+  MODE_ANIMATION = 2;
+  MODE_MANUAL = 3;
+}
+
+message ModeChangeRequest {
+  Mode mode = 1;
+}
+
+message ModeChangeResponse {
+}
+
+message SetLedRequest {
+  int32 led = 1;
+  uint32 color = 2;
+}
+
+message SetLedResponse {
+
+}
+
+message SetAnimationRequest {
+  string name = 1;
+}
+
+message SetAnimationResponse {
+}
