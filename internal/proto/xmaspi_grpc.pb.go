@@ -25,6 +25,7 @@ type XmasPIClient interface {
 	SetLed(ctx context.Context, in *SetLedRequest, opts ...grpc.CallOption) (*SetLedResponse, error)
 	SetAnimation(ctx context.Context, in *SetAnimationRequest, opts ...grpc.CallOption) (*SetAnimationResponse, error)
 	SetStatic(ctx context.Context, in *SetStaticRequest, opts ...grpc.CallOption) (*SetStaticResponse, error)
+	GetControllerInfo(ctx context.Context, in *ControllerInfoRequest, opts ...grpc.CallOption) (*ControllerInfoResponse, error)
 }
 
 type xmasPIClient struct {
@@ -62,6 +63,15 @@ func (c *xmasPIClient) SetStatic(ctx context.Context, in *SetStaticRequest, opts
 	return out, nil
 }
 
+func (c *xmasPIClient) GetControllerInfo(ctx context.Context, in *ControllerInfoRequest, opts ...grpc.CallOption) (*ControllerInfoResponse, error) {
+	out := new(ControllerInfoResponse)
+	err := c.cc.Invoke(ctx, "/XmasPI/GetControllerInfo", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // XmasPIServer is the server API for XmasPI service.
 // All implementations must embed UnimplementedXmasPIServer
 // for forward compatibility
@@ -69,6 +79,7 @@ type XmasPIServer interface {
 	SetLed(context.Context, *SetLedRequest) (*SetLedResponse, error)
 	SetAnimation(context.Context, *SetAnimationRequest) (*SetAnimationResponse, error)
 	SetStatic(context.Context, *SetStaticRequest) (*SetStaticResponse, error)
+	GetControllerInfo(context.Context, *ControllerInfoRequest) (*ControllerInfoResponse, error)
 	mustEmbedUnimplementedXmasPIServer()
 }
 
@@ -84,6 +95,9 @@ func (UnimplementedXmasPIServer) SetAnimation(context.Context, *SetAnimationRequ
 }
 func (UnimplementedXmasPIServer) SetStatic(context.Context, *SetStaticRequest) (*SetStaticResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SetStatic not implemented")
+}
+func (UnimplementedXmasPIServer) GetControllerInfo(context.Context, *ControllerInfoRequest) (*ControllerInfoResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetControllerInfo not implemented")
 }
 func (UnimplementedXmasPIServer) mustEmbedUnimplementedXmasPIServer() {}
 
@@ -152,6 +166,24 @@ func _XmasPI_SetStatic_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
+func _XmasPI_GetControllerInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ControllerInfoRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(XmasPIServer).GetControllerInfo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/XmasPI/GetControllerInfo",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(XmasPIServer).GetControllerInfo(ctx, req.(*ControllerInfoRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // XmasPI_ServiceDesc is the grpc.ServiceDesc for XmasPI service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -170,6 +202,10 @@ var XmasPI_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SetStatic",
 			Handler:    _XmasPI_SetStatic_Handler,
+		},
+		{
+			MethodName: "GetControllerInfo",
+			Handler:    _XmasPI_GetControllerInfo_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
