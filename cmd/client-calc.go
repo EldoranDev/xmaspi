@@ -7,9 +7,13 @@ import (
 	"github.com/EldoranDev/xmaspi/v2/internal/client"
 	"github.com/EldoranDev/xmaspi/v2/internal/leds"
 	"github.com/spf13/viper"
+	"image"
 
 	"github.com/spf13/cobra"
 )
+
+var scanWidth int
+var scanHeight int
 
 // calcCmd represents the calc command
 var calcCmd = &cobra.Command{
@@ -18,23 +22,31 @@ var calcCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		scan, err := client.LoadScan(
 			scanFile,
-			viper.GetInt("led.count"),
+			viper.GetInt("leds.count"),
 		)
 
 		if err != nil {
 			return err
 		}
 
-		ledList := client.ConvertScanToLeds(scan, viper.GetInt("led.count"))
+		ledList := client.ConvertScanToLeds(
+			scan,
+			viper.GetInt("leds.count"),
+			image.Point{X: scanWidth, Y: scanHeight},
+			image.Point{X: treeWidth, Y: treeHeight},
+		)
 
-		return leds.SaveLeds(coordinateFile, ledList)
+		return leds.SaveLeds(ledsFile, ledList)
 	},
 }
 
 func init() {
 	clientCmd.AddCommand(calcCmd)
 
-	calcCmd.PersistentFlags().String("out-file", "leds.json", "")
+	calcCmd.PersistentFlags().IntVar(&scanWidth, "scan-width", 1080, "")
+	calcCmd.PersistentFlags().IntVar(&scanHeight, "scan-height", 1920, "")
 
-	viper.BindPFlag("scan.coordinates", calcCmd.PersistentFlags().Lookup("out-file"))
+	viper.BindPFlag("scanner.camera.resolution.width", rootCmd.PersistentFlags().Lookup("scan-width"))
+	viper.BindPFlag("scanner.camera.resolution.height", rootCmd.PersistentFlags().Lookup("scan-height"))
+
 }

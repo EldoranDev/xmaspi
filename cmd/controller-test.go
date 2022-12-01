@@ -11,7 +11,7 @@ import (
 // testCmd represents the test command
 var testCmd = &cobra.Command{
 	Use:   "test",
-	Short: "Run a short LED test",
+	Short: "Run a short controller test",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		controller, err := getController()
 

@@ -12,8 +12,7 @@ import (
 
 // controllerCmd represents the controller command
 var controllerCmd = &cobra.Command{
-	Use:   "controller",
-	Short: "A brief description of your command",
+	Use: "controller",
 }
 
 func init() {
@@ -22,14 +21,13 @@ func init() {
 	testCmd.PersistentFlags().Int("leds", 50, "")
 	testCmd.PersistentFlags().Int("brightness", 128, "")
 
-	viper.BindPFlag("led.count", testCmd.PersistentFlags().Lookup("leds"))
-	viper.BindPFlag("led.brightness", testCmd.PersistentFlags().Lookup("brightness"))
+	viper.BindPFlag("leds.brightness", testCmd.PersistentFlags().Lookup("brightness"))
 }
 
 func getController() (led.Controller, error) {
 	return led.NewController(
-		led.WithLedCount(viper.GetInt("led.count")),
-		led.WithBrightness(viper.GetInt("led.brightness")),
+		led.WithLedCount(viper.GetInt("leds.count")),
+		led.WithBrightness(viper.GetInt("leds.brightness")),
 		led.WithDataPin(18),
 	)
 }

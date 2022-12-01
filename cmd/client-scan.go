@@ -25,8 +25,7 @@ var cameraDevice string
 // scanCmd represents the scan command
 var scanCmd = &cobra.Command{
 	Use:   "scan",
-	Short: "Run the scan",
-	Long:  ``,
+	Short: "Run the scanner",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		opts := []grpc.DialOption{
 			grpc.WithTransportCredentials(insecure.NewCredentials()),
@@ -59,10 +58,10 @@ var scanCmd = &cobra.Command{
 
 		switch cameraDevice {
 		case "remote":
-			device = viper.GetString("cam.remote")
+			device = viper.GetString("scanner.camera.remote")
 			break
 		case "local":
-			device = viper.GetInt("cam.local")
+			device = viper.GetInt("scanner.camera.local")
 			break
 		}
 		webcam, err := gocv.OpenVideoCapture(device)
@@ -71,7 +70,7 @@ var scanCmd = &cobra.Command{
 			return err
 		}
 
-		window := gocv.NewWindow("Hello")
+		window := gocv.NewWindow("Scanner")
 
 		defer webcam.Close()
 
@@ -88,7 +87,7 @@ var scanCmd = &cobra.Command{
 		// Import exisint scans
 		scan, err := client2.LoadScan(
 			scanFile,
-			int(info.LedCount),
+			ledCount,
 		)
 
 		if err != nil {
@@ -98,7 +97,7 @@ var scanCmd = &cobra.Command{
 		side := 0
 		led := 0
 
-		pi.SetLed(context.Background(), &proto.SetLedRequest{Led: int32(led), Color: 0xFFFFFF})
+		pi.SetLed(context.Background(), &proto.SetLedRequest{Led: int64(led), Color: 0xFFFFFF})
 
 		for {
 			webcam.Read(&img)
@@ -148,7 +147,7 @@ var scanCmd = &cobra.Command{
 
 				pi.SetStatic(context.Background(), &proto.SetStaticRequest{Color: 0x0})
 				pi.SetLed(context.Background(), &proto.SetLedRequest{
-					Led:   int32(led),
+					Led:   int64(led),
 					Color: 0xFFFFFF,
 				})
 
@@ -178,7 +177,7 @@ var scanCmd = &cobra.Command{
 				break
 			case 115:
 				out, _ := json.Marshal(scan)
-				os.WriteFile("./scan.json", out, 0644)
+				os.WriteFile(scanFile, out, 0644)
 				break
 			default:
 				print(key)
@@ -186,7 +185,7 @@ var scanCmd = &cobra.Command{
 		}
 
 		out, _ := json.Marshal(scan)
-		os.WriteFile("./scan.json", out, 0644)
+		os.WriteFile(scanFile, out, 0644)
 
 		return nil
 	},
@@ -195,11 +194,11 @@ var scanCmd = &cobra.Command{
 func init() {
 	clientCmd.AddCommand(scanCmd)
 
-	scanCmd.PersistentFlags().String("remote-camera", "", "")
+	scanCmd.PersistentFlags().String("camera", "", "")
 	scanCmd.PersistentFlags().Int("device", 0, "")
 
 	scanCmd.PersistentFlags().StringVarP(&cameraDevice, "camera", "c", "local", "")
 
-	viper.BindPFlag("cam.remote", scanCmd.PersistentFlags().Lookup("remote-camera"))
-	viper.BindPFlag("cam.device", scanCmd.PersistentFlags().Lookup("device"))
+	viper.BindPFlag("scanner.camera.remote", scanCmd.PersistentFlags().Lookup("camera"))
+	viper.BindPFlag("scanner.camera.device", scanCmd.PersistentFlags().Lookup("device"))
 }

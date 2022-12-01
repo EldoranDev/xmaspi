@@ -9,7 +9,6 @@ import (
 )
 
 var scanFile string
-var coordinateFile string
 
 // clientCmd represents the client command
 var clientCmd = &cobra.Command{
@@ -21,8 +20,6 @@ func init() {
 	rootCmd.AddCommand(clientCmd)
 
 	clientCmd.PersistentFlags().StringVar(&scanFile, "scan-file", "scan.json", "")
-	clientCmd.PersistentFlags().StringVar(&coordinateFile, "coord-file", "leds.json", "")
 
-	viper.BindPFlag("client.scan.file", clientCmd.PersistentFlags().Lookup("scan-file"))
-	viper.BindPFlag("client.coordinates", clientCmd.PersistentFlags().Lookup("coord-file"))
+	viper.BindPFlag("scanner.result", clientCmd.PersistentFlags().Lookup("scan-file"))
 }

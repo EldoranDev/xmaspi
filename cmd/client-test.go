@@ -18,9 +18,9 @@ import (
 // clientTestCmd represents the clientTest command
 var clientTestCmd = &cobra.Command{
 	Use:   "test",
-	Short: "A brief description of your command",
+	Short: "Run a short test of the client",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		ledList, err := leds.LoadLeds("leds.json")
+		ledList, err := leds.LoadLeds(ledsFile)
 
 		if err != nil {
 			return err
