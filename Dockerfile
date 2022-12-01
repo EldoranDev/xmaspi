@@ -25,7 +25,6 @@ COPY --from=lib_builder /usr/local/include/ws2811 /usr/local/include/ws2811
 
 WORKDIR /go/src/github.com/rpi-ws281x/rpi-ws281x-go
 COPY . .
-RUN GO111MODULE=off go get -d -v ./...
-RUN GO111MODULE=off go build -v ./...
+
 
 WORKDIR /go

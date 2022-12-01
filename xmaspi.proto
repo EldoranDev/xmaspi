@@ -7,11 +7,13 @@ service XmasPI {
   rpc SetAnimation(SetAnimationRequest) returns (SetAnimationResponse);
   rpc SetStatic(SetStaticRequest) returns (SetStaticResponse);
   rpc GetControllerInfo(ControllerInfoRequest) returns (ControllerInfoResponse);
+  rpc Render(RenderRequest) returns (RenderResponse);
 }
 
 message SetLedRequest {
-  int32 led = 1;
+  int64 led = 1;
   uint32 color = 2;
+  bool render = 3;
 }
 
 message SetLedResponse {
@@ -39,3 +41,6 @@ message ControllerInfoRequest {
 message ControllerInfoResponse {
   int64 ledCount = 1;
 }
+
+message RenderRequest {}
+message RenderResponse {}

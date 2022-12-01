@@ -8,6 +8,8 @@ type Controller interface {
 	Init() error
 	Close()
 
+	Render() error
+
 	SetLed(led int, color uint32, render bool) error
 	Fill(color uint32, render bool) error
 

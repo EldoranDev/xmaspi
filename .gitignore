@@ -2,7 +2,9 @@ xmaspi
 xmaspi-arm64
 
 scan.json
+leds.json
 .xmaspi.yaml
+*.back
 
 # Created by https://www.toptal.com/developers/gitignore/api/goland+all,osx,windows,linux
 # Edit at https://www.toptal.com/developers/gitignore?templates=goland+all,osx,windows,linux

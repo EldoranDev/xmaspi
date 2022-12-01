@@ -1,5 +1,5 @@
-//go:build client
-// +build client
+//go:build scanner
+// +build scanner
 
 package cmd
 
@@ -7,6 +7,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	client2 "github.com/EldoranDev/xmaspi/v2/internal/client"
 	"github.com/EldoranDev/xmaspi/v2/internal/proto"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -27,7 +28,6 @@ var scanCmd = &cobra.Command{
 	Short: "Run the scan",
 	Long:  ``,
 	RunE: func(cmd *cobra.Command, args []string) error {
-
 		opts := []grpc.DialOption{
 			grpc.WithTransportCredentials(insecure.NewCredentials()),
 		}
@@ -43,13 +43,13 @@ var scanCmd = &cobra.Command{
 
 		defer conn.Close()
 
-		client := proto.NewXmasPIClient(conn)
+		pi := proto.NewXmasPIClient(conn)
 
-		_, _ = client.SetStatic(context.Background(), &proto.SetStaticRequest{
+		_, _ = pi.SetStatic(context.Background(), &proto.SetStaticRequest{
 			Color: 0x000000,
 		})
 
-		info, err := client.GetControllerInfo(context.Background(), &proto.ControllerInfoRequest{})
+		info, err := pi.GetControllerInfo(context.Background(), &proto.ControllerInfoRequest{})
 
 		if err != nil {
 			return err
@@ -85,24 +85,20 @@ var scanCmd = &cobra.Command{
 
 		var pos *image.Point
 
-		// Parse Raw Data
+		// Import exisint scans
+		scan, err := client2.LoadScan(
+			scanFile,
+			int(info.LedCount),
+		)
 
-		file, err := os.ReadFile("./scan.json")
-
-		scan := make([][]image.Point, 3)
-
-		for s := range scan {
-			scan[s] = make([]image.Point, info.LedCount)
-		}
-
-		if err == nil {
-			json.Unmarshal(file, &scan)
+		if err != nil {
+			return err
 		}
 
 		side := 0
 		led := 0
 
-		client.SetLed(context.Background(), &proto.SetLedRequest{Led: int32(led), Color: 0xFFFFFF})
+		pi.SetLed(context.Background(), &proto.SetLedRequest{Led: int32(led), Color: 0xFFFFFF})
 
 		for {
 			webcam.Read(&img)
@@ -142,10 +138,16 @@ var scanCmd = &cobra.Command{
 				if int64(led) == info.LedCount {
 					led = 0
 					side++
+
+					log.Println("Tree rotation")
 				}
 
-				client.SetStatic(context.Background(), &proto.SetStaticRequest{Color: 0x0})
-				client.SetLed(context.Background(), &proto.SetLedRequest{
+				if side == 4 {
+					break
+				}
+
+				pi.SetStatic(context.Background(), &proto.SetStaticRequest{Color: 0x0})
+				pi.SetLed(context.Background(), &proto.SetLedRequest{
 					Led:   int32(led),
 					Color: 0xFFFFFF,
 				})
@@ -182,11 +184,16 @@ var scanCmd = &cobra.Command{
 				print(key)
 			}
 		}
+
+		out, _ := json.Marshal(scan)
+		os.WriteFile("./scan.json", out, 0644)
+
+		return nil
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(scanCmd)
+	clientCmd.AddCommand(scanCmd)
 
 	scanCmd.PersistentFlags().String("remote-camera", "", "")
 	scanCmd.PersistentFlags().Int("device", 0, "")

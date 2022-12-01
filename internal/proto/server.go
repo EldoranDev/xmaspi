@@ -18,6 +18,12 @@ type xmaspiServer struct {
 	controller led.Controller
 }
 
+func (x *xmaspiServer) Render(ctx context.Context, request *RenderRequest) (*RenderResponse, error) {
+	_ = x.controller.Render()
+
+	return &RenderResponse{}, nil
+}
+
 func (x *xmaspiServer) GetControllerInfo(ctx context.Context, request *ControllerInfoRequest) (*ControllerInfoResponse, error) {
 	return &ControllerInfoResponse{
 		LedCount: int64(x.controller.LedCount()),
@@ -37,7 +43,7 @@ func (x *xmaspiServer) SetLed(ctx context.Context, request *SetLedRequest) (*Set
 	x.controller.SetLed(
 		int(request.Led),
 		request.Color,
-		true,
+		request.Render,
 	)
 
 	return &SetLedResponse{}, nil
