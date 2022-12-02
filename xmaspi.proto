@@ -13,7 +13,6 @@ service XmasPI {
 message SetLedRequest {
   int64 led = 1;
   uint32 color = 2;
-  bool render = 3;
 }
 
 message SetLedResponse {

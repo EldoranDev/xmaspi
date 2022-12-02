@@ -48,7 +48,6 @@ func init() {
 	rootCmd.PersistentFlags().String("host", "localhost", "Host to use for GRPC connection")
 
 	rootCmd.PersistentFlags().StringVar(&ledsFile, "leds", "leds.json", "")
-	rootCmd.PersistentFlags().IntVar(&ledCount, "led-count", 50, "")
 
 	rootCmd.PersistentFlags().IntVar(&treeWidth, "tree-width", 100, "")
 	rootCmd.PersistentFlags().IntVar(&treeHeight, "tree-height", 180, "")
@@ -57,7 +56,6 @@ func init() {
 	viper.BindPFlag("grpc.host", rootCmd.PersistentFlags().Lookup("host"))
 
 	viper.BindPFlag("leds.file", rootCmd.PersistentFlags().Lookup("leds"))
-	viper.BindPFlag("leds.count", rootCmd.PersistentFlags().Lookup("led-count"))
 
 	viper.BindPFlag("tree.width", rootCmd.PersistentFlags().Lookup("tree-width"))
 	viper.BindPFlag("tree.height", rootCmd.PersistentFlags().Lookup("tree-height"))

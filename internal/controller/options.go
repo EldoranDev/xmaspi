@@ -1,20 +1,17 @@
-package led
+package controller
 
 var (
-	defaultLedCount   = 50
 	defaultBrightness = 128
 	defaultDataPin    = 18
 )
 
 type Options struct {
-	ledCount   int
 	brightness int
 	dataPin    int
 }
 
 func resolveOptions(options []Option) (*Options, error) {
 	o := &Options{
-		ledCount:   defaultLedCount,
 		brightness: defaultBrightness,
 		dataPin:    defaultDataPin,
 	}
@@ -30,14 +27,6 @@ func resolveOptions(options []Option) (*Options, error) {
 }
 
 type Option func(*Options) error
-
-// WithLedCount sets the number of leds that are connected to the controller
-func WithLedCount(count int) Option {
-	return func(o *Options) error {
-		o.ledCount = count
-		return nil
-	}
-}
 
 func WithBrightness(brightness int) Option {
 	return func(o *Options) error {

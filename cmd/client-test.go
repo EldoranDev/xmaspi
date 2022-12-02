@@ -6,7 +6,6 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"github.com/EldoranDev/xmaspi/v2/internal/leds"
 	"github.com/EldoranDev/xmaspi/v2/internal/proto"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -20,12 +19,6 @@ var clientTestCmd = &cobra.Command{
 	Use:   "test",
 	Short: "Run a short test of the client",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		ledList, err := leds.LoadLeds(ledsFile)
-
-		if err != nil {
-			return err
-		}
-
 		opts := []grpc.DialOption{
 			grpc.WithTransportCredentials(insecure.NewCredentials()),
 		}
@@ -43,31 +36,7 @@ var clientTestCmd = &cobra.Command{
 
 		pi := proto.NewXmasPIClient(conn)
 
-		_, _ = pi.SetStatic(context.Background(), &proto.SetStaticRequest{
-			Color: 0x00FF00,
-		})
-
-		for _, led := range ledList {
-			if led.Pos.X > 50 {
-				pi.SetLed(
-					context.Background(),
-					&proto.SetLedRequest{Led: int64(led.Index), Color: 0x0000FF, Render: false},
-				)
-			}
-		}
-
-		pi.Render(context.Background(), &proto.RenderRequest{})
-
-		for _, led := range ledList {
-			if led.Pos.X <= 50 {
-				pi.SetLed(
-					context.Background(),
-					&proto.SetLedRequest{Led: int64(led.Index), Color: 0xFF0000, Render: false},
-				)
-			}
-		}
-
-		pi.Render(context.Background(), &proto.RenderRequest{})
+		pi.SetAnimation(context.Background(), &proto.SetAnimationRequest{Name: "Test"})
 
 		return nil
 	},

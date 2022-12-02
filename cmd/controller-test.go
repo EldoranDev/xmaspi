@@ -25,10 +25,12 @@ var testCmd = &cobra.Command{
 		for i := 0; ; i++ {
 			for led := 0; led < controller.LedCount(); led++ {
 				if i%2 == 0 {
-					_ = controller.SetLed(led, 0xFFFFFF, true)
+					controller.SetLed(led, 0x00FF00)
 				} else {
-					_ = controller.SetLed(led, 0x000000, true)
+					controller.SetLed(led, 0x000000)
 				}
+
+				_ = controller.Render()
 
 				time.Sleep(time.Millisecond * 50)
 			}
