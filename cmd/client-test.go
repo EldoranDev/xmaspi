@@ -14,6 +14,8 @@ import (
 	"log"
 )
 
+var animation string
+
 // clientTestCmd represents the clientTest command
 var clientTestCmd = &cobra.Command{
 	Use:   "test",
@@ -36,12 +38,14 @@ var clientTestCmd = &cobra.Command{
 
 		pi := proto.NewXmasPIClient(conn)
 
-		pi.SetAnimation(context.Background(), &proto.SetAnimationRequest{Name: "Test"})
+		_, err = pi.SetAnimation(context.Background(), &proto.SetAnimationRequest{Name: animation})
 
-		return nil
+		return err
 	},
 }
 
 func init() {
 	clientCmd.AddCommand(clientTestCmd)
+
+	clientTestCmd.Flags().StringVar(&animation, "animation", "LeftRight", "")
 }

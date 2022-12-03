@@ -1,9 +1,11 @@
 package animations
 
 import (
-	"github.com/EldoranDev/xmaspi/v2/internal/controller"
+	xmaspi "github.com/EldoranDev/xmaspi/v2/pkg"
 	"time"
 )
+
+var _ xmaspi.Animation = (*Blinker)(nil)
 
 type Blinker struct {
 	active bool
@@ -13,12 +15,12 @@ func (b *Blinker) FrameDuration() time.Duration {
 	return time.Second * 1
 }
 
-func (b *Blinker) ApplyFrame(ctrl controller.Controller) {
+func (b *Blinker) ApplyFrame(ctrl xmaspi.Controller) {
 	b.active = !b.active
 
 	if b.active {
-		ctrl.Fill(0x000000)
+		ctrl.FillRaw(0x000000)
 	} else {
-		ctrl.Fill(0xFFFFFF)
+		ctrl.FillRaw(0xFFFFFF)
 	}
 }

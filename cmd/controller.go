@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"github.com/EldoranDev/xmaspi/v2/internal/controller"
 	"github.com/EldoranDev/xmaspi/v2/internal/leds"
+	xmaspi "github.com/EldoranDev/xmaspi/v2/pkg"
 	"github.com/spf13/viper"
 	"log"
 	"os"
@@ -22,13 +23,13 @@ var controllerCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(controllerCmd)
 
-	testCmd.PersistentFlags().Int("leds", 50, "")
 	testCmd.PersistentFlags().Int("brightness", 128, "")
 
 	viper.BindPFlag("leds.brightness", testCmd.PersistentFlags().Lookup("brightness"))
 }
 
-func getController() (controller.Controller, error) {
+func getController() (xmaspi.Controller, error) {
+	log.Printf("Using leds from %s", ledsFile)
 	file, err := os.ReadFile(ledsFile)
 
 	if err != nil {

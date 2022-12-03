@@ -25,9 +25,9 @@ var testCmd = &cobra.Command{
 		for i := 0; ; i++ {
 			for led := 0; led < controller.LedCount(); led++ {
 				if i%2 == 0 {
-					controller.SetLed(led, 0x00FF00)
+					controller.SetLedRaw(led, 0x00FF00)
 				} else {
-					controller.SetLed(led, 0x000000)
+					controller.SetLedRaw(led, 0x000000)
 				}
 
 				_ = controller.Render()

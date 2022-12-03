@@ -5,19 +5,18 @@ package proto
 
 import (
 	"context"
-	"github.com/EldoranDev/xmaspi/v2/internal/animations"
-	"github.com/EldoranDev/xmaspi/v2/internal/controller"
-	"github.com/EldoranDev/xmaspi/v2/internal/leds"
+	"github.com/EldoranDev/xmaspi/v2/internal/display/animations"
+	xmaspi "github.com/EldoranDev/xmaspi/v2/pkg"
 )
 
-func NewServer(ctrl controller.Controller) XmasPIServer {
+func NewServer(ctrl xmaspi.Controller) XmasPIServer {
 	return &xmaspiServer{
 		controller: ctrl,
 	}
 }
 
 type xmaspiServer struct {
-	controller controller.Controller
+	controller xmaspi.Controller
 }
 
 func (x *xmaspiServer) Render(ctx context.Context, request *RenderRequest) (*RenderResponse, error) {
@@ -33,13 +32,13 @@ func (x *xmaspiServer) GetControllerInfo(ctx context.Context, request *Controlle
 }
 
 func (x *xmaspiServer) SetStatic(ctx context.Context, request *SetStaticRequest) (*SetStaticResponse, error) {
-	x.controller.Fill(request.Color)
+	x.controller.FillRaw(request.Color)
 
 	return &SetStaticResponse{}, nil
 }
 
 func (x *xmaspiServer) SetLed(ctx context.Context, request *SetLedRequest) (*SetLedResponse, error) {
-	x.controller.SetLed(
+	x.controller.SetLedRaw(
 		int(request.Led),
 		request.Color,
 	)
@@ -48,15 +47,13 @@ func (x *xmaspiServer) SetLed(ctx context.Context, request *SetLedRequest) (*Set
 }
 
 func (x *xmaspiServer) SetAnimation(ctx context.Context, request *SetAnimationRequest) (*SetAnimationResponse, error) {
-	x.controller.StartAnimation(
-		&animations.Stars{
-			Color: leds.Color{
-				B: 255,
-				R: 3,
-				G: 200,
-			},
-		},
-	)
+	anim, err := animations.GetAnimation(request.Name)
+
+	if err != nil {
+		return nil, err
+	}
+
+	x.controller.StartAnimation(anim)
 
 	return &SetAnimationResponse{}, nil
 }

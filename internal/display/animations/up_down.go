@@ -1,14 +1,13 @@
 package animations
 
 import (
-	"github.com/EldoranDev/xmaspi/v2/internal/controller"
-	"github.com/EldoranDev/xmaspi/v2/internal/leds"
+	xmaspi "github.com/EldoranDev/xmaspi/v2/pkg"
 	"time"
 )
 
 type UpDown struct {
-	Top    leds.Color
-	Bottom leds.Color
+	Top    xmaspi.Color
+	Bottom xmaspi.Color
 
 	buffer    int
 	speed     int
@@ -16,14 +15,14 @@ type UpDown struct {
 	position  int
 }
 
-func (s *UpDown) Init(ctrl controller.Controller) {
+func (s *UpDown) Init(ctrl xmaspi.Controller) {
 	s.position = 90
 	s.direction = -1
 	s.speed = 5
 	s.buffer = 20
 }
 
-func (s *UpDown) ApplyFrame(ctrl controller.Controller) {
+func (s *UpDown) ApplyFrame(ctrl xmaspi.Controller) {
 	s.position += s.direction * s.speed
 
 	if s.position > 180-s.buffer || s.position < s.buffer {
@@ -32,9 +31,9 @@ func (s *UpDown) ApplyFrame(ctrl controller.Controller) {
 
 	for _, led := range ctrl.Leds() {
 		if led.Pos.Y > s.position {
-			ctrl.SetLed(led.Index, 0xFF0000)
+			ctrl.SetLed(led.Index, &s.Top)
 		} else {
-			ctrl.SetLed(led.Index, 0x0000FF)
+			ctrl.SetLed(led.Index, &s.Bottom)
 		}
 	}
 }

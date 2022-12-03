@@ -1,6 +1,8 @@
-package controller
+package pkg
 
-import "time"
+import (
+	"time"
+)
 
 type Animation interface {
 	FrameDuration() time.Duration

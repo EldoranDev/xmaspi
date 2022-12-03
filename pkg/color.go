@@ -1,4 +1,4 @@
-package leds
+package pkg
 
 type Color struct {
 	B uint8

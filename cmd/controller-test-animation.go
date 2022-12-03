@@ -4,8 +4,8 @@
 package cmd
 
 import (
-	"github.com/EldoranDev/xmaspi/v2/internal/animations"
-	"github.com/EldoranDev/xmaspi/v2/internal/leds"
+	"github.com/EldoranDev/xmaspi/v2/internal/display/animations"
+	"github.com/EldoranDev/xmaspi/v2/pkg"
 	"github.com/spf13/cobra"
 	"time"
 )
@@ -25,7 +25,7 @@ var controllerTestAnimationCmd = &cobra.Command{
 		defer controller.Close()
 
 		controller.StartAnimation(&animations.Stars{
-			Color: leds.Color{
+			Color: pkg.Color{
 				B: 255,
 				R: 3,
 				G: 200,

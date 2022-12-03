@@ -1,19 +1,18 @@
 package animations
 
 import (
-	"github.com/EldoranDev/xmaspi/v2/internal/controller"
-	"github.com/EldoranDev/xmaspi/v2/internal/leds"
+	xmaspi "github.com/EldoranDev/xmaspi/v2/pkg"
 	"math/rand"
 	"time"
 )
 
 type Stars struct {
-	Color leds.Color
+	Color xmaspi.Color
 
 	factors []float32
 }
 
-func (s *Stars) Init(ctrl controller.Controller) {
+func (s *Stars) Init(ctrl xmaspi.Controller) {
 	s.factors = make([]float32, ctrl.LedCount())
 
 	for i := 0; i < ctrl.LedCount(); i++ {
@@ -21,13 +20,13 @@ func (s *Stars) Init(ctrl controller.Controller) {
 	}
 }
 
-func (s *Stars) ApplyFrame(ctrl controller.Controller) {
+func (s *Stars) ApplyFrame(ctrl xmaspi.Controller) {
 	for i := 0; i < ctrl.LedCount(); i++ {
 		s.factors[i] = rand.Float32()
 	}
 
 	for i := 0; i < ctrl.LedCount(); i++ {
-		ctrl.SetLed(i, s.Color.DimmedInt(s.factors[i]))
+		ctrl.SetLedRaw(i, s.Color.DimmedInt(s.factors[i]))
 	}
 }
 

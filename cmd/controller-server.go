@@ -5,6 +5,7 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/EldoranDev/xmaspi/v2/internal/display/statics"
 	"github.com/EldoranDev/xmaspi/v2/internal/proto"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -40,6 +41,10 @@ var serverCmd = &cobra.Command{
 
 		controller.Init()
 		defer controller.Close()
+
+		static, err := statics.GetStatic("BlueWhite")
+
+		controller.RenderStatic(static)
 
 		_ = server.Serve(lis)
 
