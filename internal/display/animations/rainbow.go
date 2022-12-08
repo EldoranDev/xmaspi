@@ -22,11 +22,11 @@ func (s *Rainbow) Init(ctrl xmaspi.Controller) {
 	s.colors = []xmaspi.Color{
 		{R: 255, B: 0, G: 0},
 		{R: 200, B: 0, G: 100},
-		{R: 150, B: 0, G: 150},
+		{R: 200, B: 0, G: 200},
 		{R: 0, B: 0, G: 255},
 		{R: 0, B: 200, G: 0},
-		{R: 0, B: 200, G: 100},
-		{R: 100, B: 200, G: 0},
+		{R: 0, B: 200, G: 200},
+		{R: 200, B: 200, G: 0},
 	}
 }
 

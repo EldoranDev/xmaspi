@@ -8,6 +8,10 @@ service XmasPI {
   rpc SetStatic(SetStaticRequest) returns (SetStaticResponse);
   rpc GetControllerInfo(ControllerInfoRequest) returns (ControllerInfoResponse);
   rpc Render(RenderRequest) returns (RenderResponse);
+
+  rpc GetLedCount(GetLedCountRequest) returns (GetLedCountResponse);
+  rpc GetAnimations(GetAnimationsRequest) returns (GetAnimationsResponse);
+  rpc GetStatics(GetStaticsRequest) returns (GetStaticsResponse);
 }
 
 message SetLedRequest {
@@ -15,28 +19,51 @@ message SetLedRequest {
   uint32 color = 2;
 }
 
+message GetLedCountRequest {}
+message GetLedCountResponse {
+  uint32 count = 1;
+}
+
+message GetAnimationsRequest {}
+message GetAnimationsResponse {
+  message Animation {
+    string name = 1;
+    string displayName = 2;
+    string description = 3;
+  }
+
+  repeated Animation animations = 1;
+}
+
+message GetStaticsRequest {}
+message GetStaticsResponse {
+  message Static {
+    string name = 1;
+    string displayName = 2;
+    string description = 3;
+  }
+
+  repeated Static statics = 1;
+}
+
 message SetLedResponse {
 
 }
 
 message SetStaticRequest {
-  uint32 color = 1;
+  string name = 1;
 }
-
 message SetStaticResponse {
 
 }
 
 message SetAnimationRequest {
   string name = 1;
-}
-
-message SetAnimationResponse {
+}message SetAnimationResponse {
 }
 
 message ControllerInfoRequest {
 }
-
 message ControllerInfoResponse {
   int64 ledCount = 1;
 }

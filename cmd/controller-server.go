@@ -14,10 +14,10 @@ import (
 	"net"
 )
 
-// serverCmd represents the server command
-var serverCmd = &cobra.Command{
-	Use:   "server",
-	Short: "start the xmaspi server",
+// serverCmd represents the api command
+var controllerServerCmd = &cobra.Command{
+	Use:   "api",
+	Short: "start the xmaspi api",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		lis, err := net.Listen(
 			"tcp",
@@ -25,7 +25,7 @@ var serverCmd = &cobra.Command{
 		)
 
 		if err != nil {
-			log.Fatalf("Failed to start server: %v", err)
+			log.Fatalf("Failed to start api: %v", err)
 		}
 
 		var opts []grpc.ServerOption
@@ -53,5 +53,5 @@ var serverCmd = &cobra.Command{
 }
 
 func init() {
-	controllerCmd.AddCommand(serverCmd)
+	controllerCmd.AddCommand(controllerServerCmd)
 }

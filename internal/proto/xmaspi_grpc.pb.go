@@ -27,6 +27,9 @@ type XmasPIClient interface {
 	SetStatic(ctx context.Context, in *SetStaticRequest, opts ...grpc.CallOption) (*SetStaticResponse, error)
 	GetControllerInfo(ctx context.Context, in *ControllerInfoRequest, opts ...grpc.CallOption) (*ControllerInfoResponse, error)
 	Render(ctx context.Context, in *RenderRequest, opts ...grpc.CallOption) (*RenderResponse, error)
+	GetLedCount(ctx context.Context, in *GetLedCountRequest, opts ...grpc.CallOption) (*GetLedCountResponse, error)
+	GetAnimations(ctx context.Context, in *GetAnimationsRequest, opts ...grpc.CallOption) (*GetAnimationsResponse, error)
+	GetStatics(ctx context.Context, in *GetStaticsRequest, opts ...grpc.CallOption) (*GetStaticsResponse, error)
 }
 
 type xmasPIClient struct {
@@ -82,6 +85,33 @@ func (c *xmasPIClient) Render(ctx context.Context, in *RenderRequest, opts ...gr
 	return out, nil
 }
 
+func (c *xmasPIClient) GetLedCount(ctx context.Context, in *GetLedCountRequest, opts ...grpc.CallOption) (*GetLedCountResponse, error) {
+	out := new(GetLedCountResponse)
+	err := c.cc.Invoke(ctx, "/XmasPI/GetLedCount", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *xmasPIClient) GetAnimations(ctx context.Context, in *GetAnimationsRequest, opts ...grpc.CallOption) (*GetAnimationsResponse, error) {
+	out := new(GetAnimationsResponse)
+	err := c.cc.Invoke(ctx, "/XmasPI/GetAnimations", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *xmasPIClient) GetStatics(ctx context.Context, in *GetStaticsRequest, opts ...grpc.CallOption) (*GetStaticsResponse, error) {
+	out := new(GetStaticsResponse)
+	err := c.cc.Invoke(ctx, "/XmasPI/GetStatics", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // XmasPIServer is the server API for XmasPI service.
 // All implementations must embed UnimplementedXmasPIServer
 // for forward compatibility
@@ -91,6 +121,9 @@ type XmasPIServer interface {
 	SetStatic(context.Context, *SetStaticRequest) (*SetStaticResponse, error)
 	GetControllerInfo(context.Context, *ControllerInfoRequest) (*ControllerInfoResponse, error)
 	Render(context.Context, *RenderRequest) (*RenderResponse, error)
+	GetLedCount(context.Context, *GetLedCountRequest) (*GetLedCountResponse, error)
+	GetAnimations(context.Context, *GetAnimationsRequest) (*GetAnimationsResponse, error)
+	GetStatics(context.Context, *GetStaticsRequest) (*GetStaticsResponse, error)
 	mustEmbedUnimplementedXmasPIServer()
 }
 
@@ -112,6 +145,15 @@ func (UnimplementedXmasPIServer) GetControllerInfo(context.Context, *ControllerI
 }
 func (UnimplementedXmasPIServer) Render(context.Context, *RenderRequest) (*RenderResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Render not implemented")
+}
+func (UnimplementedXmasPIServer) GetLedCount(context.Context, *GetLedCountRequest) (*GetLedCountResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetLedCount not implemented")
+}
+func (UnimplementedXmasPIServer) GetAnimations(context.Context, *GetAnimationsRequest) (*GetAnimationsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAnimations not implemented")
+}
+func (UnimplementedXmasPIServer) GetStatics(context.Context, *GetStaticsRequest) (*GetStaticsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetStatics not implemented")
 }
 func (UnimplementedXmasPIServer) mustEmbedUnimplementedXmasPIServer() {}
 
@@ -216,6 +258,60 @@ func _XmasPI_Render_Handler(srv interface{}, ctx context.Context, dec func(inter
 	return interceptor(ctx, in, info, handler)
 }
 
+func _XmasPI_GetLedCount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetLedCountRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(XmasPIServer).GetLedCount(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/XmasPI/GetLedCount",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(XmasPIServer).GetLedCount(ctx, req.(*GetLedCountRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _XmasPI_GetAnimations_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetAnimationsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(XmasPIServer).GetAnimations(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/XmasPI/GetAnimations",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(XmasPIServer).GetAnimations(ctx, req.(*GetAnimationsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _XmasPI_GetStatics_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetStaticsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(XmasPIServer).GetStatics(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/XmasPI/GetStatics",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(XmasPIServer).GetStatics(ctx, req.(*GetStaticsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // XmasPI_ServiceDesc is the grpc.ServiceDesc for XmasPI service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -242,6 +338,18 @@ var XmasPI_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Render",
 			Handler:    _XmasPI_Render_Handler,
+		},
+		{
+			MethodName: "GetLedCount",
+			Handler:    _XmasPI_GetLedCount_Handler,
+		},
+		{
+			MethodName: "GetAnimations",
+			Handler:    _XmasPI_GetAnimations_Handler,
+		},
+		{
+			MethodName: "GetStatics",
+			Handler:    _XmasPI_GetStatics_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

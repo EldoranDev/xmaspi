@@ -3,6 +3,7 @@ module github.com/EldoranDev/xmaspi/v2
 go 1.19
 
 require (
+	github.com/gorilla/mux v1.8.0
 	github.com/rpi-ws281x/rpi-ws281x-go v1.0.8
 	github.com/spf13/cobra v1.6.1
 	github.com/spf13/viper v1.14.0

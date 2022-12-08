@@ -41,3 +41,11 @@ func (s *UpDown) ApplyFrame(ctrl xmaspi.Controller) {
 func (s *UpDown) FrameDuration() time.Duration {
 	return time.Millisecond * 100
 }
+
+func (s *UpDown) DisplayName() string {
+	return "Up Down"
+}
+
+func (s *UpDown) Description() string {
+	return "Splits the Tree into two sections and moves the line between them up and down"
+}

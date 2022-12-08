@@ -12,3 +12,8 @@ type Animation interface {
 type AnimationWithInitializer interface {
 	Init(ctrl Controller)
 }
+
+type AnimationWithDescription interface {
+	DisplayName() string
+	Description() string
+}

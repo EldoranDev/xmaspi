@@ -10,11 +10,21 @@ var statics = map[string]func() xmaspi.Static{
 }
 
 func GetStatic(name string) (xmaspi.Static, error) {
-	anim, ok := statics[name]
+	static, ok := statics[name]
 
 	if !ok {
 		return nil, errors.New("static does not exist")
 	}
 
-	return anim(), nil
+	return static(), nil
+}
+
+func GetAll() map[string]xmaspi.Static {
+	stcs := make(map[string]xmaspi.Static)
+
+	for s, static := range statics {
+		stcs[s] = static()
+	}
+
+	return stcs
 }

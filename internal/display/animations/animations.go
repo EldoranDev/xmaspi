@@ -34,3 +34,13 @@ func GetAnimation(name string) (xmaspi.Animation, error) {
 
 	return anim(), nil
 }
+
+func GetAll() map[string]xmaspi.Animation {
+	anims := make(map[string]xmaspi.Animation)
+
+	for s, anim := range animations {
+		anims[s] = anim()
+	}
+
+	return anims
+}
