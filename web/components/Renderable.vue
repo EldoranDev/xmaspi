@@ -5,18 +5,25 @@ defineProps<{
 </script>
 
 <template>
-    <div class="card" style="width: 18rem">
-        <div class="card-body">
-            <h5 v-if="item.displayName" class="card-title">{{ item.displayName }}</h5>
-            <h5 v-else class="card-title">{{ item.name }}</h5>
-            
-            <p v-if="item.description" class="card-text">
-                {{ item.description }}
-            </p>
-
-            <button class="btn btn-primary" @click="$emit('apply', item)">
+    <v-card
+        class="mx-auto"
+        max-width="344"
+    >
+        <v-card-item>
+            <v-card-title v-if="item.displayName">{{ item.displayName }}</v-card-title>
+            <v-card-title v-else>{{ item.name }}</v-card-title>
+        </v-card-item>
+        <v-card-text>
+            {{ item.description }}
+        </v-card-text>
+        <v-card-actions>
+            <v-btn
+                variant="outlined"
+                color="primary"
+                @click="$emit('apply', item)"
+            >
                 Run
-            </button>
-        </div>
-    </div>
+            </v-btn>
+        </v-card-actions>
+    </v-card>
 </template>
