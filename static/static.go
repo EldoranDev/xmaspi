@@ -2,7 +2,7 @@ package static
 
 import "embed"
 
-//go:embed *.html
+//go:embed *
 var Files embed.FS
 
 //go:embed index.html

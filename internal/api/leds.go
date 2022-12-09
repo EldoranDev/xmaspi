@@ -13,6 +13,7 @@ type ledsResponse struct {
 }
 
 func (a *apiHandler) GetLeds(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Content-Type", "application/json")
 
 	response, err := a.client.GetLedCount(context.Background(), &proto.GetLedCountRequest{})
