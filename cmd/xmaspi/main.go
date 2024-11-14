@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/EldoranDev/xmaspi/v3/internal"
 	"github.com/EldoranDev/xmaspi/v3/internal/mqtt"
@@ -14,16 +15,12 @@ import (
 )
 
 const clientID = "654838354938035789297247726751"
-const baseTopic = "xmaspi"
 
 func main() {
 	fmt.Println("starting xmaspi v3 - mqtt")
 
-	commandChannel := make(chan int)
-	defer close(commandChannel)
-
-	statusChannel := make(chan int)
-	defer close(statusChannel)
+	stateUpdateChan := make(chan mqtt.State)
+	defer close(stateUpdateChan)
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
@@ -36,7 +33,7 @@ func main() {
 		panic(err)
 	}
 
-	handler := mqtt.NewHandler(manager, ctx)
+	handler := mqtt.NewHandler(manager, stateUpdateChan, ctx)
 
 	pahoConfig := autopaho.ClientConfig{
 		ServerUrls:                    []*url.URL{u},
@@ -74,6 +71,40 @@ func main() {
 	if err = c.AwaitConnection(ctx); err != nil {
 		panic(err)
 	}
+
+	go func() {
+		for {
+			select {
+			case state := <-stateUpdateChan:
+				payload, err := json.Marshal(state)
+				if err != nil {
+					fmt.Printf("could not marshal message (%s)", err)
+				}
+
+				if _, err = c.Publish(ctx, &paho.Publish{
+					Topic:   mqtt.TopicSet,
+					Payload: payload,
+				}); err != nil {
+					fmt.Printf("could not publish state message (%s)\n", err)
+				}
+				break
+			case <-ctx.Done():
+				return
+			}
+		}
+	}()
+
+	config, err := json.Marshal(handler.GetConfig())
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println(string(config))
+
+	c.Publish(ctx, &paho.Publish{
+		Topic:   "homeassistant/devices",
+		Payload: config,
+	})
 
 	// Wait for interrupt
 	<-ctx.Done()

@@ -17,3 +17,13 @@ func GetRenderer(name string) (Renderer, error) {
 
 	return getRenderer(), nil
 }
+
+func GetAllRendererNames() []string {
+	list := make([]string, 0)
+
+	for key, _ := range renderers {
+		list = append(list, key)
+	}
+
+	return list
+}
