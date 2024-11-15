@@ -33,7 +33,7 @@ func NewHandler(
 
 func (h *handler) Handle(topic string, payload []byte) (bool, error) {
 	switch topic {
-	case TopicSet:
+	case CommandTopic:
 		var set State
 		if err := json.Unmarshal(payload, &set); err != nil {
 			return false, err
@@ -46,31 +46,59 @@ func (h *handler) Handle(topic string, payload []byte) (bool, error) {
 }
 
 func (h *handler) GetState() State {
-	return State{}
+	var state string
+
+	if h.manager.HasRenderer() {
+		state = "ON"
+	} else {
+		state = "OFF"
+	}
+
+	_ = h.manager.GetColor()
+
+	return State{
+		Brightness: h.manager.GetBrightness(),
+		Color:      Color{},
+		Effect:     "static",
+		State:      state,
+	}
 }
 
 func (h *handler) GetConfig() Config {
 	return Config{
-		Dev: struct {
-			Model     string `json:"model"`
-			Name      string `json:"name"`
-			SwVersion string `json:"sw_version"`
-		}{
-			Model:     "XMAS-PI5",
-			Name:      "xmaspi",
-			SwVersion: "3.0.0",
+		Device: Device{
+			Model:        "XMAS-PI5",
+			Name:         "xmaspi",
+			Manufacturer: "EldoranDev",
+			SwVersion:    "3.0.0",
+
+			Identifiers: []string{
+				"xmaspi",
+			},
 		},
-		Schema:       "json",
-		StateTopic:   TopicState,
-		CommandTopic: TopicSet,
-		Platform:     "light",
-		Qos:          "2",
-		// TODO: Add generation for unique id
-		UniqueId:            "xmaspi-5",
-		Brightness:          true,
-		Effect:              true,
-		EffectList:          rendering.GetAllRendererNames(),
-		SupportedColorModes: []string{"rgb"},
+		Origin: Origin{
+			Name:            "xmaspi",
+			SoftwareVersion: "3.0.0",
+			Url:             "https://github.com/EldoranDev/xmaspi",
+		},
+		Components: map[string]Component{
+			"leds": {
+				Schema:       "json",
+				StateTopic:   StateTopic,
+				CommandTopic: CommandTopic,
+				Platform:     "light",
+				Qos:          "2",
+				Availability: Availability{
+					Topic: AvailabilityTopic,
+				},
+				// TODO: Add generation for unique id
+				UniqueId:            "xmaspi-5",
+				Brightness:          true,
+				Effect:              true,
+				EffectList:          rendering.GetAllRendererNames(),
+				SupportedColorModes: []string{"rgb"},
+			},
+		},
 	}
 }
 

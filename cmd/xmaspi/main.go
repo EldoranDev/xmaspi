@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"github.com/EldoranDev/xmaspi/v3/internal"
 	"github.com/EldoranDev/xmaspi/v3/internal/mqtt"
@@ -16,8 +17,17 @@ import (
 
 const clientID = "654838354938035789297247726751"
 
+var broker string
+var mqttUser string
+var mqttPassword string
+
 func main() {
 	fmt.Println("starting xmaspi v3 - mqtt")
+
+	setupFlags()
+	flag.Parse()
+
+	fmt.Printf("connecting to mqtt broker at %s\n", broker)
 
 	stateUpdateChan := make(chan mqtt.State)
 	defer close(stateUpdateChan)
@@ -28,7 +38,7 @@ func main() {
 	manager := internal.NewManager()
 	defer manager.Close()
 
-	u, err := url.Parse("mqtt://mqtt.eclipseprojects.io:1883")
+	u, err := url.Parse(broker)
 	if err != nil {
 		panic(err)
 	}
@@ -51,11 +61,33 @@ func main() {
 				fmt.Printf("failed to subscribe (%s). No messages will be received.", err)
 			}
 
-			fmt.Println("mqtt subscriptions are made")
+			sendBirthMessages(ctx, cm, handler)
+		},
+		DisconnectPacketBuilder: func() *paho.Disconnect {
+			// Until I figure out how to send something before closing
+			// I'll simply disconnect without a proper message
+			// This will trigger the Will message to be send
+			return nil
+		},
+
+		OnConnectError: func(err error) {
+			panic(err)
+		},
+		ConnectUsername: mqttUser,
+		ConnectPassword: []byte(mqttPassword),
+		WillMessage: &paho.WillMessage{
+			Topic:   mqtt.AvailabilityTopic,
+			Payload: []byte("offline"),
+			Retain:  true,
 		},
 		ClientConfig: paho.ClientConfig{
 			ClientID: clientID,
 			OnPublishReceived: []func(paho.PublishReceived) (bool, error){
+				func(pr paho.PublishReceived) (bool, error) {
+					fmt.Printf("Got message: %s - %s", pr.Packet.Topic, pr.Packet.Payload)
+
+					return true, nil
+				},
 				func(pr paho.PublishReceived) (bool, error) {
 					return handler.Handle(pr.Packet.Topic, pr.Packet.Payload)
 				},
@@ -82,8 +114,9 @@ func main() {
 				}
 
 				if _, err = c.Publish(ctx, &paho.Publish{
-					Topic:   mqtt.TopicSet,
+					Topic:   mqtt.StateTopic,
 					Payload: payload,
+					Retain:  true,
 				}); err != nil {
 					fmt.Printf("could not publish state message (%s)\n", err)
 				}
@@ -94,21 +127,49 @@ func main() {
 		}
 	}()
 
-	config, err := json.Marshal(handler.GetConfig())
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Println(string(config))
-
-	c.Publish(ctx, &paho.Publish{
-		Topic:   "homeassistant/devices",
-		Payload: config,
-	})
-
 	// Wait for interrupt
 	<-ctx.Done()
 
 	// Await clean shutdown of mqtt client
 	<-c.Done()
+}
+
+func setupFlags() {
+	flag.StringVar(&broker, "broker", "mqtt://localhost:1883", "Url of the mqtt broker to connect to")
+	flag.StringVar(&mqttUser, "user", "mqtt", "Username for mqtt authentication")
+	flag.StringVar(&mqttPassword, "password", "mqtt", "Password for mqtt authentication")
+}
+
+func sendBirthMessages(ctx context.Context, cm *autopaho.ConnectionManager, handler mqtt.Handler) {
+	config, err := json.Marshal(handler.GetConfig())
+	if err != nil {
+		panic(err)
+	}
+
+	if _, err = cm.Publish(ctx, &paho.Publish{
+		Topic:   mqtt.DiscoveryTopic,
+		Payload: config,
+	}); err != nil {
+		panic(err)
+	}
+
+	state, err := json.Marshal(handler.GetState())
+	if err != nil {
+		panic(err)
+	}
+
+	if _, err = cm.Publish(ctx, &paho.Publish{
+		Topic:   mqtt.StateTopic,
+		Payload: state,
+	}); err != nil {
+		panic(err)
+	}
+
+	if _, err = cm.Publish(ctx, &paho.Publish{
+		Topic:   mqtt.AvailabilityTopic,
+		Payload: []byte("online"),
+		Retain:  true,
+	}); err != nil {
+		panic(err)
+	}
 }

@@ -7,6 +7,7 @@ import "fmt"
 var _ Controller = (*loggerController)(nil)
 
 type loggerController struct {
+	brightness uint8
 }
 
 func NewController() Controller {
@@ -23,4 +24,12 @@ func (*loggerController) Apply() {
 
 func (*loggerController) Close() {
 	fmt.Println("Closing Controller")
+}
+
+func (lc *loggerController) GetBrightness() uint8 {
+	return lc.brightness
+}
+
+func (lc *loggerController) SetBrightness(brightness uint8) {
+	lc.brightness = brightness
 }

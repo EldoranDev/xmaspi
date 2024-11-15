@@ -5,6 +5,10 @@ import (
 	"time"
 )
 
+const StaticRenderer = "static"
+
+var _ Renderer = (*static)(nil)
+
 type static struct {
 }
 
@@ -14,4 +18,8 @@ func (*static) FrameDuration() time.Duration {
 
 func (*static) ApplyFrame(ctrl led.Controller) {
 
+}
+
+func (*static) GetIdentifier() string {
+	return StaticRenderer
 }

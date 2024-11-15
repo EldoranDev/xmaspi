@@ -3,7 +3,7 @@ package rendering
 import "errors"
 
 var renderers = map[string]func() Renderer{
-	"static": func() Renderer {
+	StaticRenderer: func() Renderer {
 		return &static{}
 	},
 }

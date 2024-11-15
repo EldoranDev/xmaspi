@@ -1,5 +1,11 @@
 package mqtt
 
+const DiscoveryPrefix = "homeassistant"
+
 const TopicBase = "xmaspi"
-const TopicState = TopicBase + "/state"
-const TopicSet = TopicBase + "/set"
+
+const StateTopic = TopicBase + "/state"
+const CommandTopic = TopicBase + "/set"
+const AvailabilityTopic = TopicBase + "/availability"
+
+const DiscoveryTopic = DiscoveryPrefix + "/device/" + TopicBase + "/config"
