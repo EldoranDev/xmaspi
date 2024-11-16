@@ -1,12 +1,12 @@
 package mqtt
 
-// Following the mqtt light json schema https://www.home-assistant.io/integrations/light.mqtt/#json-schema
+// Representation of the mqtt light json schema https://www.home-assistant.io/integrations/light.mqtt/#json-schema
 
 type State struct {
-	Brightness uint8  `json:"brightness"`
-	Color      Color  `json:"color"`
-	Effect     string `json:"effect"`
-	State      string `json:"state"`
+	Brightness uint8   `json:"brightness"`
+	Color      Color   `json:"color"`
+	Effect     *string `json:"effect"`
+	State      string  `json:"state"`
 }
 
 type Color struct {
@@ -21,6 +21,8 @@ type Config struct {
 
 	Components map[string]Component `json:"cmps"`
 }
+
+// Representation of the mqtt device discovery schema https://www.home-assistant.io/integrations/mqtt/#discovery-messages
 
 type Device struct {
 	Model        string   `json:"mdl"`
