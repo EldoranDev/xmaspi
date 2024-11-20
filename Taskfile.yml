@@ -1,0 +1,14 @@
+version: '3'
+
+tasks:
+  prepare-builder:
+    cmds:
+      - docker buildx build --platform linux/arm64 --tag xmaspi-builder --file Dockerfile .
+
+  build:
+    cmds:
+      - docker run --rm -v "$PWD:/go/xmaspi" --platform linux/arm64 -w /go/xmaspi xmaspi-builder:latest go build -o xmaspi-arm64 -buildvcs=false ./cmd/xmaspi
+
+  build:test:
+    cmds:
+      - docker run --rm -v "$PWD:/go/xmaspi" --platform linux/arm64 -w /go/xmaspi xmaspi-builder:latest go build -o xmaspi-test-arm64 -buildvcs=false ./cmd/xmaspi-test

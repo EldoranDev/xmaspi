@@ -6,6 +6,7 @@ var renderers = map[string]func() Renderer{
 	StaticRenderer: func() Renderer {
 		return &static{}
 	},
+	BlueWhiteStatic: func() Renderer { return &blueWhiteStatic{} },
 }
 
 func GetRenderer(name string) (Renderer, error) {

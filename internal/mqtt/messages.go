@@ -1,18 +1,14 @@
 package mqtt
 
+import "github.com/EldoranDev/xmaspi/v3/internal/led"
+
 // Representation of the mqtt light json schema https://www.home-assistant.io/integrations/light.mqtt/#json-schema
 
 type State struct {
-	Brightness uint8   `json:"brightness"`
-	Color      Color   `json:"color"`
-	Effect     *string `json:"effect"`
-	State      string  `json:"state"`
-}
-
-type Color struct {
-	R uint8 `json:"r"`
-	G uint8 `json:"g"`
-	B uint8 `json:"b"`
+	Brightness *uint8     `json:"brightness"`
+	Color      *led.Color `json:"color"`
+	Effect     *string    `json:"effect"`
+	State      string     `json:"state"`
 }
 
 type Config struct {

@@ -16,8 +16,8 @@ func (*static) FrameDuration() time.Duration {
 	return time.Hour * 99
 }
 
-func (*static) ApplyFrame(ctrl led.Controller) {
-
+func (*static) ApplyFrame(ctrl led.Controller, color *led.Color) {
+	ctrl.Fill(color)
 }
 
 func (*static) GetIdentifier() string {

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/EldoranDev/xmaspi/v3/internal"
 	"github.com/EldoranDev/xmaspi/v3/internal/rendering"
+	"github.com/EldoranDev/xmaspi/v3/internal/to"
 	"github.com/eclipse/paho.golang/autopaho"
 	"github.com/eclipse/paho.golang/paho"
 )
@@ -61,11 +62,9 @@ func (h *handler) GetState() State {
 		state = "OFF"
 	}
 
-	_ = h.manager.GetColor()
-
 	return State{
-		Brightness: h.manager.GetBrightness(),
-		Color:      Color{},
+		Brightness: to.Uint8Ptr(h.manager.GetBrightness()),
+		Color:      h.manager.GetColor(),
 		Effect:     effect,
 		State:      state,
 	}

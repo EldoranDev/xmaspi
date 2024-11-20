@@ -2,6 +2,7 @@ package internal
 
 import (
 	"context"
+	"fmt"
 	"github.com/EldoranDev/xmaspi/v3/internal/led"
 	"github.com/EldoranDev/xmaspi/v3/internal/rendering"
 	"github.com/EldoranDev/xmaspi/v3/internal/to"
@@ -12,9 +13,10 @@ type Manager interface {
 	Close()
 	Render(ctx context.Context, renderer rendering.Renderer)
 	ClearRenderer()
+	Clear()
 	GetRendererName() *string
-	GetColor() any
-	// SetColor(any)
+	GetColor() *led.Color
+	SetColor(color led.Color)
 	GetBrightness() uint8
 	SetBrightness(uint8)
 }
@@ -22,13 +24,19 @@ type Manager interface {
 type manager struct {
 	controller led.Controller
 
+	color led.Color
+
 	renderer   rendering.Renderer
 	cancelFunc context.CancelFunc
 }
 
-func NewManager() Manager {
-	controller := led.NewController()
-	controller.Init()
+func NewManager(ctrlSettingsFile string) Manager {
+	controllerSettings := led.LoadSettings(ctrlSettingsFile)
+
+	controller := led.NewController(controllerSettings)
+	if err := controller.Init(); err != nil {
+		panic(err)
+	}
 
 	return &manager{
 		controller: controller,
@@ -47,16 +55,23 @@ func (m *manager) Render(ctx context.Context, renderer rendering.Renderer) {
 
 	active := true
 
+	fmt.Println("Setting new Renderer")
+
 	go func() {
 		if init, ok := renderer.(rendering.RendererWithInitializer); ok {
 			init.Init(m.controller)
 		}
 
+		fmt.Println("Finished Initializing new Renderer")
+
+		renderer.ApplyFrame(m.controller, &m.color)
+		_ = m.controller.Apply()
+
 		for active {
 			select {
 			case <-time.After(renderer.FrameDuration()):
-				renderer.ApplyFrame(m.controller)
-				m.controller.Apply()
+				renderer.ApplyFrame(m.controller, &m.color)
+				_ = m.controller.Apply()
 				break
 			case <-cancelCtx.Done():
 			case <-ctx.Done():
@@ -79,6 +94,10 @@ func (m *manager) ClearRenderer() {
 	m.renderer = nil
 }
 
+func (m *manager) Clear() {
+	m.controller.FillRaw(0x000000)
+}
+
 func (m *manager) GetRendererName() *string {
 	if m.renderer == nil {
 		return nil
@@ -95,8 +114,12 @@ func (m *manager) SetBrightness(brightness uint8) {
 	m.controller.SetBrightness(brightness)
 }
 
-func (m *manager) GetColor() any {
-	return nil
+func (m *manager) GetColor() *led.Color {
+	return &m.color
+}
+
+func (m *manager) SetColor(color led.Color) {
+	m.color = color
 }
 
 func (m *manager) Close() {

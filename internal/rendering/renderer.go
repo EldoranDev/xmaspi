@@ -7,7 +7,7 @@ import (
 
 type Renderer interface {
 	FrameDuration() time.Duration
-	ApplyFrame(ctrl led.Controller)
+	ApplyFrame(ctrl led.Controller, color *led.Color)
 	GetIdentifier() string
 }
 
