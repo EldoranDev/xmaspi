@@ -2,21 +2,32 @@
 
 package led
 
-import "fmt"
+import (
+	"fmt"
+	"github.com/EldoranDev/xmaspi/v3/internal/config"
+	"strconv"
+)
 
 var _ Controller = (*loggerController)(nil)
 
 type loggerController struct {
 	brightness uint8
-	settings   *Settings
+	config     *config.Config
+	leds       []Led
 }
 
-func NewController(settings *Settings) Controller {
-	fmt.Printf("Starting with %d LEDs\n", len(settings.Leds))
+func NewController(config *config.Config) Controller {
+	brightness, err := strconv.Atoi(config.Led.MaxBrightness)
+	if err != nil {
+		panic(err)
+	}
+
+	leds := getLeds(config.Led.LedFile)
 
 	return &loggerController{
-		brightness: settings.MaxBrightness,
-		settings:   settings,
+		brightness: uint8(brightness),
+		config:     config,
+		leds:       leds,
 	}
 }
 
@@ -36,7 +47,7 @@ func (*loggerController) Close() {
 }
 
 func (l *loggerController) GetLedCount() uint32 {
-	return uint32(len(l.settings.Leds))
+	return uint32(len(l.leds))
 }
 
 func (l *loggerController) SetLed(led int, color *Color) {

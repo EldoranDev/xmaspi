@@ -3,6 +3,7 @@ package internal
 import (
 	"context"
 	"fmt"
+	"github.com/EldoranDev/xmaspi/v3/internal/config"
 	"github.com/EldoranDev/xmaspi/v3/internal/led"
 	"github.com/EldoranDev/xmaspi/v3/internal/rendering"
 	"github.com/EldoranDev/xmaspi/v3/internal/to"
@@ -30,16 +31,15 @@ type manager struct {
 	cancelFunc context.CancelFunc
 }
 
-func NewManager(ctrlSettingsFile string) Manager {
-	controllerSettings := led.LoadSettings(ctrlSettingsFile)
-
-	controller := led.NewController(controllerSettings)
+func NewManager(config *config.Config) Manager {
+	controller := led.NewController(config)
 	if err := controller.Init(); err != nil {
 		panic(err)
 	}
 
 	return &manager{
 		controller: controller,
+		color:      led.Color{R: 255, G: 255, B: 255},
 	}
 }
 
@@ -96,6 +96,7 @@ func (m *manager) ClearRenderer() {
 
 func (m *manager) Clear() {
 	m.controller.FillRaw(0x000000)
+	_ = m.controller.Apply()
 }
 
 func (m *manager) GetRendererName() *string {

@@ -3,31 +3,42 @@
 package led
 
 import (
-	"fmt"
+	"github.com/EldoranDev/xmaspi/v3/internal/config"
 	ws2811 "github.com/rpi-ws281x/rpi-ws281x-go"
+	"strconv"
 )
 
 type ws281xController struct {
 	device     *ws2811.WS2811
-	settings   *Settings
+	config     *config.Config
+	leds       []Led
 	brightness uint8
 }
 
-func NewController(settings *Settings) Controller {
+func NewController(cfg *config.Config) Controller {
+	brightness, err := strconv.Atoi(cfg.Led.MaxBrightness)
+	if err != nil {
+		panic(err)
+	}
+
+	leds := getLeds(cfg.Led.LedFile)
 	opt := ws2811.DefaultOptions
 
-	fmt.Printf("Starting with %d LEDs\n", len(settings.Leds))
-	fmt.Println("Starting with Hardware Controller")
+	pin, err := strconv.Atoi(cfg.DataPin)
+	if err != nil {
+		panic(err)
+	}
 
-	opt.Channels[0].Brightness = int(settings.MaxBrightness)
-	opt.Channels[0].GpioPin = int(settings.DataPin)
-	opt.Channels[0].LedCount = len(settings.Leds)
+	opt.Channels[0].Brightness = brightness
+	opt.Channels[0].GpioPin = pin
+	opt.Channels[0].LedCount = len(leds)
 
 	dev, _ := ws2811.MakeWS2811(&opt)
 
 	return &ws281xController{
-		device:   dev,
-		settings: settings,
+		device: dev,
+		config: cfg,
+		leds:   leds,
 	}
 }
 
@@ -44,7 +55,7 @@ func (w *ws281xController) Apply() error {
 }
 
 func (w *ws281xController) GetLedCount() uint32 {
-	return uint32(len(w.settings.Leds))
+	return uint32(len(w.leds))
 }
 
 func (w *ws281xController) SetLed(led int, color *Color) {

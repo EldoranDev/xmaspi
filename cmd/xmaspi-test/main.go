@@ -1,20 +1,20 @@
 package main
 
-import "github.com/EldoranDev/xmaspi/v3/internal/led"
+import (
+	"github.com/EldoranDev/xmaspi/v3/internal/config"
+	"github.com/EldoranDev/xmaspi/v3/internal/led"
+)
 
 func main() {
-	settings := led.Settings{
-		Leds: []led.Led{
-			{},
-			{},
-			{},
-			{},
+	cfg := &config.Config{
+		DataPin: "18",
+		Led: config.LedConfig{
+			MaxBrightness: "100",
+			LedFile:       "./leds.json",
 		},
-		DataPin:       18,
-		MaxBrightness: 255,
 	}
 
-	controller := led.NewController(&settings)
+	controller := led.NewController(cfg)
 
 	if err := controller.Init(); err != nil {
 		panic(err)
