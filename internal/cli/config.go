@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"fmt"
 	"github.com/EldoranDev/xmaspi/v3/internal/config"
 	"github.com/spf13/viper"
 )
@@ -22,7 +23,7 @@ func GetConfig() *config.Config {
 	viper.AddConfigPath(".")
 
 	if err := viper.ReadInConfig(); err != nil {
-		panic(err)
+		fmt.Println("No configuration file loaded")
 	}
 
 	if err := viper.Unmarshal(&cfg); err != nil {
