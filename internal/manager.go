@@ -53,8 +53,6 @@ func (m *manager) Render(ctx context.Context, renderer rendering.Renderer) {
 	m.cancelFunc = cancelFunc
 	m.renderer = renderer
 
-	active := true
-
 	fmt.Println("Setting new Renderer")
 
 	go func() {
@@ -67,16 +65,16 @@ func (m *manager) Render(ctx context.Context, renderer rendering.Renderer) {
 		renderer.ApplyFrame(m.controller, &m.color)
 		_ = m.controller.Apply()
 
-		for active {
+		for {
 			select {
 			case <-time.After(renderer.FrameDuration()):
 				renderer.ApplyFrame(m.controller, &m.color)
 				_ = m.controller.Apply()
 				break
 			case <-cancelCtx.Done():
+				return
 			case <-ctx.Done():
-				active = false
-				break
+				return
 			}
 		}
 	}()
